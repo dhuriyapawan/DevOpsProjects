@@ -27,7 +27,7 @@ jobs:
 
       # 4. Build Java application
       - name: Build with Gradle
-        run: ./gradlew clean build
+        run: ./gradlew clean build  --no-daemon
 
       # 5. Login to Docker Hub
       - name: Login to Docker Hub
