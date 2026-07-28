@@ -51,4 +51,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/java-gradelapp:latest
+          tags: pawand1/java-gradelapp:latest
