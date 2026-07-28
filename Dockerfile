@@ -11,7 +11,7 @@ RUN gradle clean bootjar --no-daemon
 
 FROM eclipse-temurin:21-jre-alpine
 
-RUN useradd -D -u 1000 appuser
+RUN useradd -m -u 1000 appuser
 
 WORKDIR /app
 
