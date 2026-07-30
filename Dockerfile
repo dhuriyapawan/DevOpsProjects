@@ -18,8 +18,7 @@ RUN chmod +x gradlew
 COPY src ./src
 
 # Build application
-RUN ./gradlew clean build -x test
-
+RUN ./gradlew clean build -x test --no-daemon --stacktrace --info
 
 # =========================
 # Runtime stage
