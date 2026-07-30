@@ -1,24 +1,41 @@
-FROM eclipse-temurin:8-jdk-alpine AS builder
+# =========================
+# Build stage
+# =========================
+FROM eclipse-temurin:21-jdk-alpine AS build
 
 WORKDIR /app
 
-COPY gradlew gradlew.bat ./
+# Copy Gradle files
+COPY gradlew .
 COPY gradle ./gradle
-COPY build.gradle settings.gradle ./
+COPY build.gradle .
+COPY settings.gradle .
+
+# Make Gradle wrapper executable
+RUN chmod +x gradlew
+
+# Copy source code
 COPY src ./src
 
-RUN chmod +x gradlew && ./gradlew clean build --no-daemon
+# Build application
+RUN ./gradlew clean build -x test
 
-FROM eclipse-temurin:8-jre-alpine
 
-RUN adduser -D -u 1000 appuser
+# =========================
+# Runtime stage
+# =========================
+FROM eclipse-temurin:21-jre-alpine
+
+# Create non-root user
+RUN addgroup -S appgroup && \
+    adduser -S -u 1000 -G appgroup appuser
 
 WORKDIR /app
 
-COPY --from=builder /app/build/libs/*.jar app.jar
+# Copy generated JAR
+COPY --from=build /app/build/libs/*.jar app.jar
 
-RUN chown -R appuser:appuser /app
-
+# Run as non-root user
 USER appuser
 
 EXPOSE 8080
