@@ -1,15 +1,15 @@
-FROM gradle:8.10-jdk-alpine AS builder
+FROM eclipse-temurin:8-jdk-alpine AS builder
 
 WORKDIR /app
 
-COPY build.gradle settings.gradle ./
+COPY gradlew gradlew.bat ./
 COPY gradle ./gradle
-
+COPY build.gradle settings.gradle ./
 COPY src ./src
 
-RUN gradle clean bootjar --no-daemon
+RUN chmod +x gradlew && ./gradlew clean build --no-daemon
 
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:8-jre-alpine
 
 RUN adduser -D -u 1000 appuser
 
