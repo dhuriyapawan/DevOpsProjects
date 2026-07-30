@@ -1,23 +1,23 @@
-# Build stage
-FROM maven:3.9-eclipse-temurin-21-alpine AS build
+FROM eclipse-temurin:8-jdk-alpine AS builder
 
 WORKDIR /app
 
-COPY pom.xml .
+COPY gradlew gradlew.bat ./
+COPY gradle ./gradle
+COPY build.gradle settings.gradle ./
 COPY src ./src
 
-RUN mvn clean package -DskipTests
+RUN chmod +x gradlew && ./gradlew clean build --no-daemon
 
+FROM eclipse-temurin:8-jre-alpine
 
-# Runtime stage
-FROM eclipse-temurin:21-jre-alpine
-
-RUN addgroup -S appgroup && \
-    adduser -S -u 1000 -G appgroup appuser
+RUN adduser -D -u 1000 appuser
 
 WORKDIR /app
 
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=builder /app/build/libs/*.jar app.jar
+
+RUN chown -R appuser:appuser /app
 
 USER appuser
 
