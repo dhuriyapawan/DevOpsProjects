@@ -1,11 +1,11 @@
 # =========================
 # Build Stage
 # =========================
-FROM eclipse-temurin:21-jdk-jammy AS build
+FROM eclipse-temurin:8-jdk-jammy AS build
 
 WORKDIR /app
 
-# Copy Gradle project
+# Copy project
 COPY . .
 
 # Fix Windows CRLF line endings
@@ -19,7 +19,7 @@ RUN ./gradlew clean build -x test --no-daemon --stacktrace
 # =========================
 # Runtime Stage
 # =========================
-FROM eclipse-temurin:21-jre-jammy
+FROM eclipse-temurin:8-jre-jammy
 
 WORKDIR /app
 
