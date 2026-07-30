@@ -1,35 +1,31 @@
 # =========================
-# Build stage
+# Build Stage
 # =========================
-FROM eclipse-temurin:21-jdk-alpine AS build
+FROM eclipse-temurin:21-jdk-jammy AS build
 
 WORKDIR /app
 
-# Copy Gradle files
-COPY gradlew .
-COPY gradle ./gradle
-COPY build.gradle .
-COPY settings.gradle .
+# Copy Gradle project
+COPY . .
 
-# Make Gradle wrapper executable
-RUN chmod +x gradlew
-
-# Copy source code
-COPY src ./src
+# Fix Windows CRLF line endings
+# and make Gradle wrapper executable
+RUN sed -i 's/\r$//' gradlew && chmod +x gradlew
 
 # Build application
-RUN ./gradlew clean build -x test --no-daemon --stacktrace --info
+RUN ./gradlew clean build -x test --no-daemon --stacktrace
+
 
 # =========================
-# Runtime stage
+# Runtime Stage
 # =========================
-FROM eclipse-temurin:21-jre-alpine
-
-# Create non-root user
-RUN addgroup -S appgroup && \
-    adduser -S -u 1000 -G appgroup appuser
+FROM eclipse-temurin:21-jre-jammy
 
 WORKDIR /app
+
+# Create non-root user
+RUN groupadd -r appgroup && \
+    useradd -r -g appgroup -u 1000 appuser
 
 # Copy generated JAR
 COPY --from=build /app/build/libs/*.jar app.jar
